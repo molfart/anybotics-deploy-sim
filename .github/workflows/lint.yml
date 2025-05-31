@@ -1,3 +1,4 @@
+---
 name: Lint & CI checks
 
 on:
@@ -6,19 +7,58 @@ on:
       - '**.yml'
       - '**.sh'
       - '**.md'
+      - 'ansible/**'
   pull_request:
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
+      # Checkout repository
       - uses: actions/checkout@v3
 
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      # Install Python dependencies (Ansible, Molecule, etc.)
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # YAML Lint
       - name: YAML Lint
         uses: ibiqlik/action-yamllint@v3
 
+      # ShellCheck (alternative action)
       - name: ShellCheck
-        uses: ludeeus/action-shellcheck@v2
+        uses: ludeeus/action-shellcheck@master
 
+      # Markdown Link Check
       - name: Markdown Link Check
         uses: gaurav-nelson/github-action-markdown-link-check@v1
+
+      # Ansible Syntax Check (example playbook)
+      - name: Ansible Syntax Check
+        run: |
+          ansible-playbook --syntax-check ansible/playbooks/base_setup.yml
+
+
+  dry-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Run dry run via start.sh
+        run: |
+          chmod +x start.sh
+          ./start.sh
