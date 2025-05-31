@@ -1,0 +1,11 @@
+# Python / Ansible
+*.retry
+__pycache__/
+*.pyc
+
+# Logs / Env
+*.log
+.env
+
+# System
+.DS_Store

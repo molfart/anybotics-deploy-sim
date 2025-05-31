@@ -1,0 +1,24 @@
+name: Lint & CI checks
+
+on:
+  push:
+    paths:
+      - '**.yml'
+      - '**.sh'
+      - '**.md'
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: YAML Lint
+        uses: ibiqlik/action-yamllint@v3
+
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@v2
+
+      - name: Markdown Link Check
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
