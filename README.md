@@ -44,6 +44,22 @@ To run `start.sh`, you need the following tools installed on your system:
 - `requirements.txt` – Python dependencies for Ansible/Molecule/etc.
 - `docs/` – Documentation and architecture diagrams **TODO**
 
+## What happens when you run `start.sh`?
+
+1. Starts the dev container (via Docker Compose)
+2. Runs Ansible to:
+   - Install Docker and Docker Compose on both node_a and node_b
+   - Start Docker daemon inside both containers
+   - Enable TCP access from node_a to node_b
+
+## Manual verification (optional)
+
+To verify that node_a controls node_b:
+
+```bash
+docker compose exec dev bash
+docker -H tcp://node_b:2375 ps
+
 ## Continuous Integration
 
 This project uses GitHub Actions for:
