@@ -2,14 +2,21 @@
 set -e
 
 if ! command -v docker compose &> /dev/null; then
-  echo "Docker-compose is required but not installed. Aborting."
+  echo "Docker compose is required but not installed. Aborting."
   exit 1
 fi
 
 echo "Starting ANYbotics Deployment Simulation Setup..."
 
-docker-compose -f docker/dev/docker-compose.yml run --rm dev \
-  ansible-playbook ansible/playbooks/base_setup.yml \
+echo "Bringing up simulation containers (node_a, node_b)..."
+docker compose up -d
+
+# --- Wait briefly to ensure containers are ready ---
+sleep 2
+
+echo "Starting development environment container and running ansible-playbook"
+docker compose exec dev ansible-playbook ansible/playbooks/base_setup.yml
+
 
 # Run ansible-playbook commands here once playbooks are ready
 

@@ -1,0 +1,36 @@
+---
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: docker/dev/Dockerfile
+    volumes:
+      - .:/workspace
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /workspace
+    tty: true
+    networks:
+      - simnet
+
+  node_a:
+    image: ubuntu:24.04
+    container_name: node_a
+    privileged: true
+    networks:
+      - simnet
+    tty: true
+    command: sleep infinity
+
+  node_b:
+    image: ubuntu:24.04
+    container_name: node_b
+    privileged: true
+    networks:
+      - simnet
+    tty: true
+    command: sleep infinity
+
+
+networks:
+  simnet:
+    driver: bridge
