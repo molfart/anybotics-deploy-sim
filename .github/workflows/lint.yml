@@ -47,7 +47,7 @@ jobs:
           ansible-playbook --syntax-check ansible/playbooks/base_setup.yml
 
 
-  dry-run:
+  ansible-run:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

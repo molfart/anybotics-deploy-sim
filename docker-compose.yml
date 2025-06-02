@@ -1,34 +1,42 @@
+ # Docker Compose configuration for simulating ANYbotics deployment
+ # Includes dev container and two Ubuntu-based nodes in a shared network
 ---
+name: anybotics-sim
+
 services:
   dev:
+    container_name: dev
     build:
       context: .
       dockerfile: docker/dev/Dockerfile
+    working_dir: /workspace
     volumes:
       - .:/workspace
       - /var/run/docker.sock:/var/run/docker.sock
-    working_dir: /workspace
     tty: true
+    restart: unless-stopped
     networks:
       - simnet
 
   node_a:
-    image: ubuntu:24.04
     container_name: node_a
+    image: ubuntu:24.04
+    command: sleep infinity
+    tty: true
     privileged: true
+    restart: unless-stopped
     networks:
       - simnet
-    tty: true
-    command: sleep infinity
 
   node_b:
-    image: ubuntu:24.04
     container_name: node_b
+    image: ubuntu:24.04
+    command: sleep infinity
+    tty: true
     privileged: true
+    restart: unless-stopped
     networks:
       - simnet
-    tty: true
-    command: sleep infinity
 
 
 networks:
