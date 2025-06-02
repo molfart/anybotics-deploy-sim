@@ -1,5 +1,4 @@
 ---
-
 # Install Python using raw module because
 # Ansible modules require Python on the target
 - name: Install Python (required for Ansible)
@@ -46,7 +45,7 @@
 - name: Verify Docker is running
   command: docker version
   register: docker_output
-  failed_when: "{{ docker_output.rc != 0 }}"
+  failed_when: docker_output.rc != 0
 
 # Output Docker version information for verification
 - name: Show Docker version info

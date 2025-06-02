@@ -1,0 +1,31 @@
+---
+# Deploy echo server on node_b using Docker Compose
+# Copies the Compose file and starts the container
+- name: Deploy echo server on node_b
+  block:
+    - copy:
+        src: docker-compose-node_b.yml
+        dest: /opt/docker-compose.yml
+    - command: docker compose -f /opt/docker-compose.yml up -d
+  when: inventory_hostname == 'node_b'
+
+# Deploy nginx on node_a using Docker Compose
+# Includes copying the Compose and Nginx config, then starting the container
+- name: Deploy nginx on node_a
+  block:
+    - copy:
+        src: docker-compose-node_a.yml
+        dest: /opt/docker-compose.yml
+    - copy:
+        src: nginx.conf
+        dest: /opt/nginx.conf
+    - command: docker compose -f /opt/docker-compose.yml up -d
+  when: inventory_hostname == 'node_a'
+
+- name: Verify nginx can access echo service on node_b
+  uri:
+    url: http://node_b:8080
+    return_content: true
+  register: echo_check
+  failed_when: echo_check.status != 200
+  when: inventory_hostname == 'node_a'
