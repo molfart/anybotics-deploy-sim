@@ -44,6 +44,8 @@ To run `start.sh`, you need the following tools installed on your system:
 - `requirements.txt` – Python dependencies for Ansible/Molecule/etc.
 - `docs/` – Documentation and architecture diagrams **TODO**
 
+
+
 ## What happens when you run `start.sh`?
 
 1. Starts the dev container (via Docker Compose)
@@ -51,6 +53,49 @@ To run `start.sh`, you need the following tools installed on your system:
    - Install Docker and Docker Compose on both node_a and node_b
    - Start Docker daemon inside both containers
    - Enable TCP access from node_a to node_b
+
+## Architecture Overview
+
+This setup simulates a minimal distributed deployment with two nodes:
+
+- **node_a**: Acts as the controller node.
+  - Installs Docker and runs a container with **Nginx**.
+  - Nginx is configured as a reverse proxy to forward requests to the echo service on node_b.
+  - Has full Docker API access to node_b via TCP (port 2375).
+
+- **node_b**: The target node.
+  - Hosts a container running `mendhak/http-https-echo`.
+  - The container exposes port `8080`.
+
+All containers are started via Docker Compose through Ansible. The controller node interacts with the remote daemon using `docker -H tcp://node_b:2375`.
+
+## Docker & Docker Compose Best Practices
+
+This project follows modern best practices for containerized deployments, including:
+
+- **Separation of concerns**:
+  Each node has a dedicated purpose (controller vs service node).
+- **Externalization of configuration**:
+  Compose files are separate and modular.
+- **Docker Compose v2 syntax**:
+  Modern `docker compose` CLI is used without deprecated `version:` key.
+- **Slim but usable base images**:
+  Uses `ubuntu:24.04` to maintain a balance between usability (for Ansible, networking, debugging) and image size.
+- **Persistent and observable Docker daemons**:
+  Logs routed to files via `nohup`, TCP daemon made accessible on a defined port.
+- **Network awareness**:
+  Use of `network_mode: host` to allow inter-node communication in a controlled environment.
+- **Explicit port mapping and exposure**:
+  Services expose only the ports that are required for inter-container communication, avoiding unnecessary exposure to the host.
+
+## Ansible Best Practices
+
+- Idempotency: Playbooks are written to be repeatable without side effects, using conditions like `creates:` to avoid redundant actions.
+- Modular Roles: Each logical group of tasks (e.g., Docker setup, application deployment) is encapsulated in a dedicated role.
+- Explicit Conditions: Tasks include `when` clauses and checks to reduce unnecessary execution and improve reliability.
+- Shell/Command Usage Justification: `shell` or `command` is only used when no better Ansible module is available, with fallback to safe patterns like `creates`.
+- Use of `wait_for`: Ensures dependent services like Docker are up before proceeding, increasing playbook robustness.
+- End-to-End Testing: Service availability is verified using Ansible's `uri` module to test connectivity between nodes and validate that deployed applications respond correctly.
 
 ## Manual verification (optional)
 
