@@ -62,10 +62,16 @@ This setup simulates a minimal distributed deployment with two nodes:
   - Installs Docker and runs a container with **Nginx**.
   - Nginx is configured as a reverse proxy to forward requests to the echo service on node_b.
   - Has full Docker API access to node_b via TCP (port 2375).
+  - Runs a cAdvisor container to expose real-time resource metrics of running containers.
 
 - **node_b**: The target node.
   - Hosts a container running `mendhak/http-https-echo`.
   - The container exposes port `8080`.
+  - Runs a cAdvisor container to expose real-time resource metrics of running containers.
+
+- **prometheus**: Scrapes metrics from both node_a and node_b. Provides a web UI at localhost:9090 to explore container resource usage across the system.
+
+- **cadvisor_dev**: Collects metrics about containers running on host environment itself.
 
 All containers are started via Docker Compose through Ansible. The controller node interacts with the remote daemon using `docker -H tcp://node_b:2375`.
 
@@ -87,6 +93,7 @@ This project follows modern best practices for containerized deployments, includ
   Use of `network_mode: host` to allow inter-node communication in a controlled environment.
 - **Explicit port mapping and exposure**:
   Services expose only the ports that are required for inter-container communication, avoiding unnecessary exposure to the host.
+- Integrated lightweight monitoring with cAdvisor and Prometheus to track runtime metrics and ensure transparency of container workloads.
 
 ## Ansible Best Practices
 
@@ -96,6 +103,24 @@ This project follows modern best practices for containerized deployments, includ
 - Shell/Command Usage Justification: `shell` or `command` is only used when no better Ansible module is available, with fallback to safe patterns like `creates`.
 - Use of `wait_for`: Ensures dependent services like Docker are up before proceeding, increasing playbook robustness.
 - End-to-End Testing: Service availability is verified using Ansible's `uri` module to test connectivity between nodes and validate that deployed applications respond correctly.
+
+## Observability with Prometheus & cAdvisor
+
+This setup includes a lightweight observability stack using Prometheus and cAdvisor.
+
+- **cAdvisor** runs on both `node_a` and `node_b` and collects metrics on container resource usage.
+- **Prometheus** is deployed in the dev container and scrapes metrics from both nodes.
+- The Prometheus web interface is accessible at localhost:9090.
+
+### Example: View Container CPU Usage
+
+To view CPU usage for running containers, use the following Prometheus query:
+
+```
+rate(container_cpu_usage_seconds_total{image!=""}[1m])
+```
+
+This provides a per-second CPU usage rate for each container over the last minute.
 
 ## Manual verification (optional)
 

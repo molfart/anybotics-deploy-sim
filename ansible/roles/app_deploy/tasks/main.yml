@@ -3,10 +3,12 @@
 # Copies the Compose file and starts the container
 - name: Deploy echo server on node_b
   block:
-    - copy:
+    - name: Copy docker-compose to node_b
+      copy:
         src: docker-compose-node_b.yml
         dest: /opt/docker-compose.yml
-    - command: docker compose -f /opt/docker-compose.yml up -d
+    - name: Start echo server container with Docker Compose
+      command: docker compose -f /opt/docker-compose.yml up -d
   when: inventory_hostname == 'node_b'
 
 # Deploy nginx on node_a using Docker Compose
