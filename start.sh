@@ -24,8 +24,11 @@ sleep 2
 echo "Starting development environment container and running ansible-playbook"
 docker compose exec dev ansible-playbook ansible/playbooks/base_setup.yml
 
-
-# Run ansible-playbook commands here once playbooks are ready
+open "http://localhost:9090/query?\
+g0.expr=rate(container_cpu_usage_seconds_total{image!=\"\"}[1m])&\
+g0.show_tree=0&g0.tab=graph&g0.range_input=30m&g0.res_type=auto&\
+g0.res_density=medium&g0.display_mode=lines&g0.show_exemplars=0" \
+|| echo "Warning: Failed to open browser. Please visit http://localhost:9090 manually."
 
 echo "Setup complete."
 exit 0
