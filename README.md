@@ -41,14 +41,14 @@ To run `start.sh`, you need the following tools installed on your system:
 - `docker/dev/` – Development environment setup
 - `.github/workflows/` – CI/CD pipeline definitions
 - `start.sh` – Entry point for provisioning and deployment
-- `requirements.txt` – Python dependencies for Ansible/Molecule/etc.
-- `docs/` – Documentation and architecture diagrams **TODO**
+- `requirements.txt` – Python dependencies for Ansible/Molecule/etc
+- `docs/` – Documentation and architecture diagrams
 
 
 
 ## What happens when you run `start.sh`?
 
-1. Starts the dev container (via Docker Compose)
+1. Starts the dev, node_a, node_b containers (via Docker Compose)
 2. Runs Ansible to:
    - Install Docker and Docker Compose on both node_a and node_b
    - Start Docker daemon inside both containers
@@ -114,7 +114,7 @@ This project follows modern best practices for containerized deployments, includ
 This setup includes a lightweight observability stack using Prometheus and cAdvisor.
 
 - **cAdvisor** runs on both `node_a` and `node_b` and collects metrics on container resource usage.
-- **Prometheus** is deployed in the dev container and scrapes metrics from both nodes.
+- **Prometheus** scrapes metrics from both nodes.
 - The Prometheus web interface is accessible at localhost:9090.
 
 ### Example: View Container CPU Usage
@@ -132,7 +132,7 @@ This provides a per-second CPU usage rate for each container over the last minut
 To verify that node_a controls node_b:
 
 ```bash
-docker compose exec dev bash
+docker compose exec node_a bash
 docker -H tcp://node_b:2375 ps
 
 ## Continuous Integration
@@ -142,7 +142,7 @@ This project uses GitHub Actions for:
 - Shell script linting
 - Markdown link checking
 - Ansible playbook syntax checking
-- Execution of `start.sh` inside the dev container as part of the CI pipeline
+- Execution of `start.sh` and whole setup as part of the CI pipeline
 
 See `.github/workflows/lint.yml` for details.
 
