@@ -56,7 +56,12 @@ To run `start.sh`, you need the following tools installed on your system:
 
 ## Architecture Overview
 
-This setup simulates a minimal distributed deployment with two nodes:
+![Architecture Diagram](docs/architecture.png)
+
+This setup simulates a minimal distributed deployment with two nodes and a control environment:
+
+- **dev**: The development and control container.
+  - Runs Ansible to provision and configure both node_a and node_b.
 
 - **node_a**: Acts as the controller node.
   - Installs Docker and runs a container with **Nginx**.
@@ -73,7 +78,7 @@ This setup simulates a minimal distributed deployment with two nodes:
 
 - **cadvisor_dev**: Collects metrics about containers running on host environment itself.
 
-All containers are started via Docker Compose through Ansible. The controller node interacts with the remote daemon using `docker -H tcp://node_b:2375`.
+All containers are started via Docker Compose through Ansible running in the dev container. The controller node interacts with the remote daemon using `docker -H tcp://node_b:2375`.
 
 ## Docker & Docker Compose Best Practices
 
