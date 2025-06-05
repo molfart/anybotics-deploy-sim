@@ -1,4 +1,4 @@
-# ANYbotics Tech Challenge – Deployment Simulation
+# Deployment Simulation
 
 This project provisions a simulated two-instance environment using Ansible and Docker Compose.
 
@@ -11,7 +11,7 @@ All logic is contained in Ansible playbooks and launched via `start.sh`.
 
 CI and structure are maintained to reflect real-world deployment best practices.
 
-Inside the container, you can run all commands as usual (e.g., Ansible, Molecule, Python).
+Inside the container, you can run all commands as usual (e.g., Ansible, Python).
 
 
 ## Requirements
@@ -26,8 +26,8 @@ To run `start.sh`, you need the following tools installed on your system:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/molfart/anybotics-deploy-sim.git
-   cd anybotics-deploy-sim
+   git clone https://github.com/molfart/deploy-sim.git
+   cd deploy-sim
    ```
 
 2. **Run the setup script:**
@@ -95,7 +95,7 @@ This project follows modern best practices for containerized deployments, includ
 - **Persistent and observable Docker daemons**:
   Logs routed to files via `nohup`, TCP daemon made accessible on a defined port.
 - **Network awareness**:
-  Use of `network_mode: host` to allow inter-node communication in a controlled environment.
+  Use of `network_mode: host` for **Nginx** to allow inter-node communication in a controlled environment.
 - **Explicit port mapping and exposure**:
   Services expose only the ports that are required for inter-container communication, avoiding unnecessary exposure to the host.
 - Integrated lightweight monitoring with cAdvisor and Prometheus to track runtime metrics and ensure transparency of container workloads.
@@ -113,7 +113,7 @@ This project follows modern best practices for containerized deployments, includ
 
 This setup includes a lightweight observability stack using Prometheus and cAdvisor.
 
-- **cAdvisor** runs on both `node_a` and `node_b` and collects metrics on container resource usage.
+- **cAdvisor** runs on the host, `node_a` and `node_b` and collects metrics on container resource usage.
 - **Prometheus** scrapes metrics from both nodes.
 - The Prometheus web interface is accessible at localhost:9090.
 
